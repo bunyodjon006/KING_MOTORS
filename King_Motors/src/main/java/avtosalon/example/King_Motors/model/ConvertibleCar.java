@@ -2,10 +2,9 @@ package avtosalon.example.King_Motors.model;
 
 import jakarta.persistence.*;
 
-
 @Entity
-@Table(name = "electrictar")
-public class ElectricCar {
+@Table(name="convertiblecar")
+public class ConvertibleCar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,10 +21,10 @@ public class ElectricCar {
     @Column(name = "cost")
     private  String cost;
 
-    public ElectricCar() {
+    public ConvertibleCar() {
     }
 
-    public ElectricCar(Long id, String modelname, String informationcar, String fuel, String carbox, String caryear, String cost) {
+    public ConvertibleCar(Long id, String modelname, String informationcar, String fuel, String carbox, String caryear, String cost) {
         this.id = id;
         this.modelname = modelname;
         this.informationcar = informationcar;
@@ -59,20 +58,20 @@ public class ElectricCar {
         this.informationcar = informationcar;
     }
 
-    public String getCarbox() {
-        return carbox;
-    }
-
-    public void setCarbox(String carbox) {
-        this.carbox = carbox;
-    }
-
     public String getFuel() {
         return fuel;
     }
 
     public void setFuel(String fuel) {
         this.fuel = fuel;
+    }
+
+    public String getCarbox() {
+        return carbox;
+    }
+
+    public void setCarbox(String carbox) {
+        this.carbox = carbox;
     }
 
     public String getCaryear() {
