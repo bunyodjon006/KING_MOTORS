@@ -1,7 +1,6 @@
 package avtosalon.example.King_Motors.controller;
 
 import avtosalon.example.King_Motors.ExceptionNot;
-import avtosalon.example.King_Motors.model.TruckCar;
 import avtosalon.example.King_Motors.model.VanCar;
 import avtosalon.example.King_Motors.repository.VanCarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
