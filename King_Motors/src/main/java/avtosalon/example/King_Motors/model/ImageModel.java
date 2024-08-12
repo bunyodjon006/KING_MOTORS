@@ -5,26 +5,19 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "imagemodel")
 public class ImageModel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String type;
+
     @Column(length = 500000000)
     private byte picByte;
 
-    public ImageModel() {
-    }
-
-    public ImageModel(Long id, String name, String type, byte picByte) {
-        this.id = id;
-        this.name = name;
-        this.type = type;
-        this.picByte = picByte;
-    }
-
-    public ImageModel(String originalFilename, String contentType, byte[] bytes) {
-    }
+    @Column(name = "image_link")
+    private String imageLink;
 
     public Long getId() {
         return id;
@@ -56,5 +49,13 @@ public class ImageModel {
 
     public void setPicByte(byte picByte) {
         this.picByte = picByte;
+    }
+
+    public String getImageLink() {
+        return imageLink;
+    }
+
+    public void setImageLink(String imageLink) {
+        this.imageLink = imageLink;
     }
 }

@@ -1,10 +1,12 @@
 package avtosalon.example.King_Motors.controller;
 
 import avtosalon.example.King_Motors.ExceptionNot;
+import avtosalon.example.King_Motors.FileUploadUtilService;
 import avtosalon.example.King_Motors.model.ConvertibleCar;
 import avtosalon.example.King_Motors.model.ImageModel;
 import avtosalon.example.King_Motors.repository.ConvertibleCarRepository;
 import avtosalon.example.King_Motors.service.ConvertibleCarService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +23,13 @@ import java.util.List;
 @CrossOrigin(origins = "*",maxAge = 3600)
 public class ConvertibleCarController {
 
-
     @Autowired
     ConvertibleCarRepository convertibleCarRepository;
     @Autowired
     ConvertibleCarService convertibleCarService;
+
+    @Autowired
+    FileUploadUtilService fileUploadUtilService;
 
     @GetMapping("/convertiblecar")
     public List<ConvertibleCar> getAllConvertibleCar(){
@@ -36,31 +40,43 @@ public class ConvertibleCarController {
         return convertibleCarRepository.findById(id);
     }
 
-    @PostMapping(value= {"/addnewProduct"} ,consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ConvertibleCar addnewCar(@RequestPart("product") ConvertibleCar convertibleCar,
-                                    @RequestPart("imagefile")MultipartFile[] file){
+    @PostMapping("/addnewProduct")
+    public ConvertibleCar addnewCar(@RequestParam("product") String convertibleCarJson,
+                                    @RequestParam("imagefile") MultipartFile[] file) {
 //        return convertibleCarService.addnewProduct(convertibleCar);
 
         try {
-            Set<ImageModel> images= uploadImage(file);
+
+            ConvertibleCar convertibleCar = new ObjectMapper().readValue(convertibleCarJson, ConvertibleCar.class);
+
+            Set<ImageModel> images = uploadImage(file, convertibleCar);
             convertibleCar.setProductImages(images);
-          return  convertibleCarService.addnewProduct(convertibleCar);
-        } catch(Exception e){
+
+            return convertibleCarService.addnewProduct(convertibleCar);
+        }
+        catch (Exception e) {
+
             System.out.println(e.getMessage());
+
             return null;
         }
     }
 
-    public Set<ImageModel> uploadImage(MultipartFile[] multipartFiles)throws IOException {
-        Set<ImageModel> imageModels=new HashSet<>();
-        for(MultipartFile file:multipartFiles){
-            ImageModel imageModel =new ImageModel(
-                    file.getOriginalFilename(),
-                    file.getContentType(),
-                    file.getBytes()
-            );
+    public Set<ImageModel> uploadImage(MultipartFile[] multipartFiles, ConvertibleCar convertibleCar)throws IOException {
+
+        Set<ImageModel> imageModels = new HashSet<>();
+        int count = 1;
+
+        for (MultipartFile file:multipartFiles) {
+
+            ImageModel imageModel = new ImageModel();
+            imageModel.setImageLink(fileUploadUtilService.
+                    handleMediaUpload(convertibleCar.getModelname().trim().replace(" ", "_") + "_" + count + "_image", file));
+            count++;
+
             imageModels.add(imageModel);
         }
+
         return imageModels;
     }
 
