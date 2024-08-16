@@ -1,22 +1,28 @@
 package avtosalon.example.King_Motors.controller;
 
 import avtosalon.example.King_Motors.ExceptionNot;
-import avtosalon.example.King_Motors.model.ElectricCar;
-import avtosalon.example.King_Motors.model.HatchbackCar;
+import avtosalon.example.King_Motors.FileUploadUtilService;
+import avtosalon.example.King_Motors.model.*;
 import avtosalon.example.King_Motors.repository.HatchbackCarRepository;
+import avtosalon.example.King_Motors.service.HatchbackCarService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerExecutionChain;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
 @CrossOrigin(origins = "*",maxAge = 3600)
 public class HatchbackCarController {
+    @Autowired
+    FileUploadUtilService fileUploadUtilService;
+    @Autowired
+    HatchbackCarService hatchbackCarService;
     @Autowired
     HatchbackCarRepository hatchbackCarRepository;
     @GetMapping("/hatchbackcar")
@@ -30,6 +36,38 @@ public class HatchbackCarController {
                 .orElseThrow(()-> new ExceptionNot("Not found id"+id));
         return ResponseEntity.ok(hatchbackCar);
     }
+    @PostMapping("/addnewhatchbacProducts")
+    public HatchbackCar addnewCar(@RequestParam("product") String hatchbackCarJson,
+                                  @RequestParam("imagefile") MultipartFile[] multipartFiles){
+
+        try {
+            HatchbackCar hatchbackCar = new ObjectMapper().readValue(hatchbackCarJson, HatchbackCar.class);
+            Set<ImageModelHatchbackCar> images = uploadImage(multipartFiles, hatchbackCar);
+
+            hatchbackCar.setProductImages(images);
+
+            return hatchbackCarService.addnewProducts(hatchbackCar);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    public Set<ImageModelHatchbackCar> uploadImage(MultipartFile[] multipartFiles, HatchbackCar hatchbackCar) throws IOException {
+        Set<ImageModelHatchbackCar> imageModelHatchbackCars = new HashSet<>();
+        int count = 1;
+        for (MultipartFile file : multipartFiles) {
+            ImageModelHatchbackCar imageModelHatchbackCar = new ImageModelHatchbackCar();
+            imageModelHatchbackCar.setImageLink(fileUploadUtilService.handleMediaUpload(hatchbackCar.getModelname().trim().replace(" ", "_") + "_" + count + "_image", file));
+
+            count++;
+            imageModelHatchbackCars.add(imageModelHatchbackCar);
+        }
+
+        return imageModelHatchbackCars;
+    }
+
+
     @PostMapping("/hatchbackcar")
     public HatchbackCar createHachbackcar(@RequestBody HatchbackCar hatchbackCar){
         return hatchbackCarRepository.save(hatchbackCar);

@@ -2,6 +2,8 @@ package avtosalon.example.King_Motors.model;
 
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "crasovercar")
 public class CrasoverCar {
@@ -20,6 +22,23 @@ public class CrasoverCar {
     private String caryear;
     @Column(name = "cost")
     private  String cost;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "product_ImageModelCrasover",
+            joinColumns = {
+                    @JoinColumn(name = "product_id")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "image_id")
+            })
+    private Set<ImageModelCrasover> productImages;
+
+    public Set<ImageModelCrasover> getProductImages() {
+        return productImages;
+    }
+
+    public void setProductImages(Set<ImageModelCrasover> productImages) {
+        this.productImages = productImages;
+    }
 
     public CrasoverCar() {
     }

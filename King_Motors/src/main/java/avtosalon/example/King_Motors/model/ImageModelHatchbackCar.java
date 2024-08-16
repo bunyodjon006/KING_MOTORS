@@ -3,13 +3,11 @@ package avtosalon.example.King_Motors.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Imagemodel")
-public class ImageModel {
-    //ConvertibleCar and ImageModel
+@Table(name = "ImageModelHatchbackCar")
+public class ImageModelHatchbackCar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String type;
 
@@ -19,20 +17,20 @@ public class ImageModel {
     @Column(name = "image_link")
     private String imageLink;
 
+    public String getImageLink() {
+        return imageLink;
+    }
+
+    public void setImageLink(String imageLink) {
+        this.imageLink = imageLink;
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getType() {
@@ -43,6 +41,14 @@ public class ImageModel {
         this.type = type;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public byte getPicByte() {
         return picByte;
     }
@@ -51,11 +57,6 @@ public class ImageModel {
         this.picByte = picByte;
     }
 
-    public String getImageLink() {
-        return imageLink;
-    }
 
-    public void setImageLink(String imageLink) {
-        this.imageLink = imageLink;
-    }
+
 }

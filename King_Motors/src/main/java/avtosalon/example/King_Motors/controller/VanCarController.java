@@ -1,21 +1,27 @@
 package avtosalon.example.King_Motors.controller;
 
 import avtosalon.example.King_Motors.ExceptionNot;
-import avtosalon.example.King_Motors.model.VanCar;
+import avtosalon.example.King_Motors.FileUploadUtilService;
+import avtosalon.example.King_Motors.model.*;
 import avtosalon.example.King_Motors.repository.VanCarRepository;
+import avtosalon.example.King_Motors.service.VanCarService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
 @CrossOrigin(origins = "*",maxAge = 3600)
 public class VanCarController {
+    @Autowired
+    FileUploadUtilService fileUploadUtilService;
+    @Autowired
+    VanCarService vanCarService;
     @Autowired
     VanCarRepository vanCarRepository;
     @GetMapping("/vancar")
@@ -26,7 +32,45 @@ public class VanCarController {
     public Optional<VanCar> getVancar(@PathVariable Long id) {
         return vanCarRepository.findById(id);
     }
+    @PostMapping("/addnewvancarProducts")
+    public VanCar addnewCar(@RequestParam("product") String vancarJson,
+                            @RequestParam("imagefile") MultipartFile[] multipartFiles){
 
+
+        try {
+
+            VanCar vanCar = new ObjectMapper().readValue(vancarJson,VanCar.class);
+
+            Set<ImageModelVanCar> images = uploadImage(multipartFiles,vanCar);
+            vanCar.setProductImages(images);
+
+            return vanCarService.addnewProducts(vanCar);
+        }
+        catch (Exception e) {
+
+            System.out.println(e.getMessage());
+
+            return null;
+        }
+    }
+
+    public Set<ImageModelVanCar> uploadImage(MultipartFile[] multipartFiles, VanCar vanCar)throws IOException {
+
+        Set<ImageModelVanCar> imageModelVanCars = new HashSet<>();
+        int count = 1;
+
+        for (MultipartFile file:multipartFiles) {
+
+            ImageModelVanCar imageModelVanCar = new ImageModelVanCar();
+            imageModelVanCar.setImageLink(fileUploadUtilService.
+                    handleMediaUpload(vanCar.getModelname().trim().replace(" ", "_") + "_" + count + "_image", file));
+            count++;
+
+            imageModelVanCars.add(imageModelVanCar);
+        }
+
+        return imageModelVanCars;
+    }
     @PostMapping("/vancar")
     public VanCar createVancar(@RequestBody VanCar vanCar){
         return vanCarRepository.save(vanCar);

@@ -1,22 +1,30 @@
 package avtosalon.example.King_Motors.controller;
 
 import avtosalon.example.King_Motors.ExceptionNot;
+import avtosalon.example.King_Motors.FileUploadUtilService;
 import avtosalon.example.King_Motors.model.ConvertibleCar;
 import avtosalon.example.King_Motors.model.CrasoverCar;
+import avtosalon.example.King_Motors.model.ImageModel;
+import avtosalon.example.King_Motors.model.ImageModelCrasover;
 import avtosalon.example.King_Motors.repository.CrasoverCarRepository;
+import avtosalon.example.King_Motors.service.CrasoverCarService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
 @CrossOrigin(origins = "*",maxAge = 3600)
 public class CrasoverCarController {
+    @Autowired
+    FileUploadUtilService fileUploadUtilService;
+    @Autowired
+    CrasoverCarService crasoverCarService;
     @Autowired
     CrasoverCarRepository crasoverCarRepository;
     @GetMapping("/crasovercar")
@@ -26,6 +34,46 @@ public class CrasoverCarController {
     @GetMapping("/crasovercar/{id}")
     public Optional<CrasoverCar> getCrasover(@PathVariable Long id) {
         return crasoverCarRepository.findById(id);
+    }
+
+    @PostMapping("/addnewcrasoverProducts")
+    public CrasoverCar addnewCar(@RequestParam("product") String crossoverCarJson,
+                                    @RequestParam("imagefile") MultipartFile[] multipartFiles){
+
+
+        try {
+
+            CrasoverCar crasoverCar = new ObjectMapper().readValue(crossoverCarJson,CrasoverCar.class);
+                    Set<ImageModelCrasover> images=uploadImage(multipartFiles,crasoverCar);
+
+                  crasoverCar.setProductImages(images);
+
+            return crasoverCarService.addnewProducts(crasoverCar);
+        }
+        catch (Exception e) {
+
+            System.out.println(e.getMessage());
+
+            return null;
+        }
+    }
+
+    public Set<ImageModelCrasover> uploadImage(MultipartFile[] multipartFiles, CrasoverCar crasoverCar)throws IOException {
+
+        Set<ImageModelCrasover> imageModelsCrasover = new HashSet<>();
+        int count = 1;
+
+        for (MultipartFile file:multipartFiles) {
+
+          ImageModelCrasover imageModelCrasover = new ImageModelCrasover();
+            imageModelCrasover.setImageLink(fileUploadUtilService.
+                    handleMediaUpload(crasoverCar.getModelname().trim().replace(" ", "_") + "_" + count + "_image", file));
+            count++;
+
+            imageModelsCrasover.add(imageModelCrasover);
+        }
+
+        return imageModelsCrasover;
     }
 
     @PostMapping("/crasovercar")

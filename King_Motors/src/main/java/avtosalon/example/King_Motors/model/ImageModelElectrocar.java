@@ -3,11 +3,10 @@ package avtosalon.example.King_Motors.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Imagemodel")
-public class ImageModel {
-    //ConvertibleCar and ImageModel
+@Table(name="ImageModelElectrocar")
+public class ImageModelElectrocar {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;

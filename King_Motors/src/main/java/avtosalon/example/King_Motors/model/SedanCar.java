@@ -1,6 +1,9 @@
 package avtosalon.example.King_Motors.model;
 
 import jakarta.persistence.*;
+
+import java.util.Set;
+
 @Entity
 @Table(name = "sedan")
 public class SedanCar {
@@ -19,6 +22,23 @@ public class SedanCar {
     private String caryear;
     @Column(name = "cost")
     private  String cost;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "product_imageselectsedancar",
+            joinColumns = {
+                    @JoinColumn(name = "product_id")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "image_id")
+            })
+    private Set<ImageModelSedanCar> productImages;
+
+    public Set<ImageModelSedanCar> getProductImages() {
+        return productImages;
+    }
+
+    public void setProductImages(Set<ImageModelSedanCar> productImages) {
+        this.productImages = productImages;
+    }
 
     public SedanCar() {
     }

@@ -40,7 +40,7 @@ public class ConvertibleCarController {
         return convertibleCarRepository.findById(id);
     }
 
-    @PostMapping("/addnewProduct")
+    @PostMapping("/addnewconvertiblecarProduct")
     public ConvertibleCar addnewCar(@RequestParam("product") String convertibleCarJson,
                                     @RequestParam("imagefile") MultipartFile[] file) {
 //        return convertibleCarService.addnewProduct(convertibleCar);
